@@ -11,18 +11,6 @@ const SignUpPage = () => {
     password: "",
   });
 
-  // This is how we did it at first, without using our custom hook
-  // const queryClient = useQueryClient();
-  // const {
-  //   mutate: signupMutation,
-  //   isPending,
-  //   error,
-  // } = useMutation({
-  //   mutationFn: signup,
-  //   onSuccess: () => queryClient.invalidateQueries({ queryKey: ["authUser"] }),
-  // });
-
-  // This is how we did it using our custom hook - optimized version
   const { isPending, error, signupMutation } = useSignUp();
 
   const handleSignup = (e) => {
@@ -36,8 +24,10 @@ const SignUpPage = () => {
       data-theme="forest"
     >
       <div className="border border-primary/25 flex flex-col lg:flex-row w-full max-w-5xl mx-auto bg-base-100 rounded-xl shadow-lg overflow-hidden">
-        {/* SIGNUP FORM - LEFT SIDE */}
+
+        {/* SIGNUP FORM LEFT */}
         <div className="w-full lg:w-1/2 p-4 sm:p-8 flex flex-col">
+
           {/* LOGO */}
           <div className="mb-4 flex items-center justify-start gap-2">
             <ShipWheelIcon className="size-9 text-primary" />
@@ -46,16 +36,18 @@ const SignUpPage = () => {
             </span>
           </div>
 
-          {/* ERROR MESSAGE IF ANY */}
+          {/* ERROR MESSAGE */}
           {error && (
             <div className="alert alert-error mb-4">
-              <span>{error.response.data.message}</span>
+              <span>{error?.response?.data?.message || "Something went wrong"}</span>
             </div>
           )}
 
+          {/* FORM */}
           <div className="w-full">
             <form onSubmit={handleSignup}>
               <div className="space-y-4">
+
                 <div>
                   <h2 className="text-xl font-semibold">Create an Account</h2>
                   <p className="text-sm opacity-70">
@@ -64,7 +56,8 @@ const SignUpPage = () => {
                 </div>
 
                 <div className="space-y-3">
-                  {/* FULLNAME */}
+
+                  {/* FULL NAME */}
                   <div className="form-control w-full">
                     <label className="label">
                       <span className="label-text">Full Name</span>
@@ -78,6 +71,7 @@ const SignUpPage = () => {
                       required
                     />
                   </div>
+
                   {/* EMAIL */}
                   <div className="form-control w-full">
                     <label className="label">
@@ -92,6 +86,7 @@ const SignUpPage = () => {
                       required
                     />
                   </div>
+
                   {/* PASSWORD */}
                   <div className="form-control w-full">
                     <label className="label">
@@ -110,6 +105,7 @@ const SignUpPage = () => {
                     </p>
                   </div>
 
+                  {/* TERMS */}
                   <div className="form-control">
                     <label className="label cursor-pointer justify-start gap-2">
                       <input type="checkbox" className="checkbox checkbox-sm" required />
@@ -122,7 +118,8 @@ const SignUpPage = () => {
                   </div>
                 </div>
 
-                <button className="btn btn-primary w-full" type="submit">
+                {/* BUTTON */}
+                <button className="btn btn-primary w-full" type="submit" disabled={isPending}>
                   {isPending ? (
                     <>
                       <span className="loading loading-spinner loading-xs"></span>
@@ -133,6 +130,7 @@ const SignUpPage = () => {
                   )}
                 </button>
 
+                {/* LOGIN LINK */}
                 <div className="text-center mt-4">
                   <p className="text-sm">
                     Already have an account?{" "}
@@ -141,15 +139,16 @@ const SignUpPage = () => {
                     </Link>
                   </p>
                 </div>
+
               </div>
             </form>
           </div>
+
         </div>
 
-        {/* SIGNUP FORM - RIGHT SIDE */}
+        {/* RIGHT SIDE IMAGE */}
         <div className="hidden lg:flex w-full lg:w-1/2 bg-primary/10 items-center justify-center">
           <div className="max-w-md p-8">
-            {/* Illustration */}
             <div className="relative aspect-square max-w-sm mx-auto">
               <img src="/i.png" alt="Language connection illustration" className="w-full h-full" />
             </div>
@@ -162,6 +161,7 @@ const SignUpPage = () => {
             </div>
           </div>
         </div>
+
       </div>
     </div>
   );

@@ -1,73 +1,87 @@
 import { Link, useLocation } from "react-router";
 import useAuthUser from "../hooks/useAuthUser";
-import { BellIcon, HomeIcon, ShipWheelIcon, UsersIcon } from "lucide-react";
+import { Bell, Home, Compass, Users, Settings } from "lucide-react";
 
 const Sidebar = () => {
   const { authUser } = useAuthUser();
   const location = useLocation();
   const currentPath = location.pathname;
 
+  const menuItem = (to, Icon, label) => {
+    const isActive = currentPath === to;
+
+    return (
+      <Link
+        to={to}
+        className={`
+          flex items-center gap-3 w-full px-4 py-2 rounded-lg
+          transition-all duration-150     /* 🔹 Fast + subtle */
+          ${isActive
+            ? "bg-white/10 text-white"
+            : "text-gray-300 hover:bg-white/5 hover:text-white hover:scale-[1.01]"
+          }
+        `}
+      >
+        <Icon className="size-5" />
+        <span className="text-sm">{label}</span>
+      </Link>
+    );
+  };
+
   return (
-    <aside className="w-64 bg-base-200 border-r border-base-300 hidden lg:flex flex-col h-screen sticky top-0">
-      <div className="p-5 border-b border-base-300">
-        <Link to="/" className="flex items-center gap-2.5">
-          <ShipWheelIcon className="size-9 text-primary" />
-          <span className="text-3xl font-bold font-mono bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary  tracking-wider">
+    <aside
+      className="
+        w-64 hidden lg:flex flex-col h-screen sticky top-0
+        border-r border-white/10
+      "
+      style={{
+        background:
+          "linear-gradient(180deg, #1f2937, #111827)",   // 🔹 Clean dark theme
+      }}
+    >
+      {/* LOGO */}
+      <div className="px-5 py-5 border-b border-white/10">
+        <Link className="flex items-center gap-2 select-none" to="/">
+          <Compass className="size-6 text-white" />
+          <span className="font-semibold text-[18px] tracking-tight text-white">
             Streamify
           </span>
         </Link>
       </div>
 
-      <nav className="flex-1 p-4 space-y-1">
-        <Link
-          to="/"
-          className={`btn btn-ghost justify-start w-full gap-3 px-3 normal-case ${
-            currentPath === "/" ? "btn-active" : ""
-          }`}
-        >
-          <HomeIcon className="size-5 text-base-content opacity-70" />
-          <span>Home</span>
-        </Link>
-
-        <Link
-          to="/friends"
-          className={`btn btn-ghost justify-start w-full gap-3 px-3 normal-case ${
-            currentPath === "/friends" ? "btn-active" : ""
-          }`}
-        >
-          <UsersIcon className="size-5 text-base-content opacity-70" />
-          <span>Friends</span>
-        </Link>
-
-        <Link
-          to="/notifications"
-          className={`btn btn-ghost justify-start w-full gap-3 px-3 normal-case ${
-            currentPath === "/notifications" ? "btn-active" : ""
-          }`}
-        >
-          <BellIcon className="size-5 text-base-content opacity-70" />
-          <span>Notifications</span>
-        </Link>
+      {/* MENU */}
+      <nav className="flex-1 px-4 py-4 space-y-2">
+        {menuItem("/", Home, "Home")}
+        {menuItem("/friends", Users, "Friends")}
+        {menuItem("/notifications", Bell, "Notifications")}
+        {menuItem("/settings", Settings, "Settings")}
       </nav>
 
-      {/* USER PROFILE SECTION */}
-      <div className="p-4 border-t border-base-300 mt-auto">
+      {/* USER FOOTER */}
+      <div className="p-4 border-t border-white/10 mt-auto">
         <div className="flex items-center gap-3">
+
           <div className="avatar">
-            <div className="w-10 rounded-full">
+            <div className="w-11 rounded-full ring-2 ring-primary/40">
               <img src={authUser?.profilePic} alt="User Avatar" />
             </div>
           </div>
-          <div className="flex-1">
-            <p className="font-semibold text-sm">{authUser?.fullName}</p>
-            <p className="text-xs text-success flex items-center gap-1">
-              <span className="size-2 rounded-full bg-success inline-block" />
+
+          <div className="flex-1 text-white">
+            <p className="font-semibold text-sm truncate">
+              {authUser?.fullName}
+            </p>
+
+            <p className="text-xs flex items-center gap-1 text-green-400">
+              <span className="size-2 rounded-full bg-green-400 inline-block" />
               Online
             </p>
           </div>
+
         </div>
       </div>
     </aside>
   );
 };
+
 export default Sidebar;

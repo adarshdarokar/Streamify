@@ -1,8 +1,14 @@
 import axios from "axios";
 
-const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5001/api" : "/api";
+// Auto detect host (localhost OR mobile IP)
+const HOST = window.location.hostname; 
+
+const BASE_URL =
+  import.meta.env.MODE === "development"
+    ? `http://${HOST}:5001/api`
+    : "/api";
 
 export const axiosInstance = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true, // send cookies with the request
+  withCredentials: true, 
 });

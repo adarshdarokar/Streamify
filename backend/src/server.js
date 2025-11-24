@@ -8,20 +8,33 @@ import { fileURLToPath } from "url";
 import authRoutes from "./routes/auth.route.js";
 import userRoutes from "./routes/user.route.js";
 import chatRoutes from "./routes/chat.route.js";
-
 import { connectDB } from "./lib/db.js";
 
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// FIX: __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// CORS
+// Auto allow local + mobile IP
+const LOCAL_IP = "10.148.158.165";
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  `http://${LOCAL_IP}:5173`,
+  process.env.CLIENT_URL
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "*",
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      console.log("❌ CORS BLOCKED:", origin);
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
   })
 );
@@ -29,24 +42,19 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-// API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/chat", chatRoutes);
 
-// STATIC FILES FOR RENDER DEPLOY
 if (process.env.NODE_ENV === "production") {
   const frontendPath = path.join(__dirname, "../../frontend/dist");
-
   app.use(express.static(frontendPath));
-
   app.get("*", (req, res) => {
     res.sendFile(path.join(frontendPath, "index.html"));
   });
 }
 
-
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`🔥 Server running on port ${PORT}`);
   connectDB();
 });

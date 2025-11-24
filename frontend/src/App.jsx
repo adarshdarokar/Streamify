@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-
+import SettingsPage from "./pages/SettingsPage.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import SignUpPage from "./pages/SignUpPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
@@ -7,26 +7,48 @@ import NotificationsPage from "./pages/NotificationsPage.jsx";
 import CallPage from "./pages/CallPage.jsx";
 import ChatPage from "./pages/ChatPage.jsx";
 import OnboardingPage from "./pages/OnboardingPage.jsx";
-import FriendCard from "./components/FriendCard.jsx"; // ✅ New import
 
 import { Toaster } from "react-hot-toast";
 
 import PageLoader from "./components/PageLoader.jsx";
 import useAuthUser from "./hooks/useAuthUser.js";
 import Layout from "./components/Layout.jsx";
-import { useThemeStore } from "./store/useThemeStore.js";
+
+import { useEffect, useState } from "react";
 
 const App = () => {
   const { isLoading, authUser } = useAuthUser();
-  const { theme } = useThemeStore();
 
   const isAuthenticated = Boolean(authUser);
   const isOnboarded = authUser?.isOnboarded;
 
+  const [theme, setTheme] = useState("light");
+
+  // ✅ Load theme from localStorage on app load
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("app_general_settings_v1");
+      if (raw) {
+        const savedTheme = JSON.parse(raw)?.theme;
+        if (savedTheme) {
+          setTheme(savedTheme);
+          document.documentElement.setAttribute("data-theme", savedTheme);
+        }
+      }
+    } catch {}
+  }, []);
+
+  // ✅ Whenever theme state updates → apply it to HTML
+  useEffect(() => {
+    if (theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+    }
+  }, [theme]);
+
   if (isLoading) return <PageLoader />;
 
   return (
-    <div className="h-screen" data-theme={theme}>
+    <div className="h-screen">
       <Routes>
         <Route
           path="/"
@@ -40,18 +62,29 @@ const App = () => {
             )
           }
         />
+
         <Route
           path="/signup"
           element={
-            !isAuthenticated ? <SignUpPage /> : <Navigate to={isOnboarded ? "/" : "/onboarding"} />
+            !isAuthenticated ? (
+              <SignUpPage />
+            ) : (
+              <Navigate to={isOnboarded ? "/" : "/onboarding"} />
+            )
           }
         />
+
         <Route
           path="/login"
           element={
-            !isAuthenticated ? <LoginPage /> : <Navigate to={isOnboarded ? "/" : "/onboarding"} />
+            !isAuthenticated ? (
+              <LoginPage />
+            ) : (
+              <Navigate to={isOnboarded ? "/" : "/onboarding"} />
+            )
           }
         />
+
         <Route
           path="/notifications"
           element={
@@ -64,6 +97,7 @@ const App = () => {
             )
           }
         />
+
         <Route
           path="/call/:id"
           element={
@@ -74,6 +108,7 @@ const App = () => {
             )
           }
         />
+
         <Route
           path="/chat/:id"
           element={
@@ -86,19 +121,20 @@ const App = () => {
             )
           }
         />
-        {/* ✅ New route for friends */}
+
         <Route
           path="/friends"
           element={
             isAuthenticated && isOnboarded ? (
               <Layout showSidebar={true}>
-                <FriendCard /> 
+                <HomePage showOnlyFriends={true} />
               </Layout>
             ) : (
               <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
             )
           }
         />
+
         <Route
           path="/onboarding"
           element={
@@ -113,6 +149,8 @@ const App = () => {
             )
           }
         />
+
+        <Route path="/settings" element={<SettingsPage />} />
       </Routes>
 
       <Toaster />
